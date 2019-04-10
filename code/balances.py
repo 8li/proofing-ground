@@ -15,7 +15,8 @@ except OSError:
 DEFAULT_KWARGS = { 'n_users' : int(config['default']['n_users']),
                    'init_issue' : config['default']['init_issue'],
                    'reward_dist' : config['default']['reward_dist'],
-                   'reward' : config['default']['reward'] }
+                   'reward' : config['default']['reward'],
+                   'n_miners_max' : int(config['default']['n_miners_max'])}
 
 
 def generate_random_key():
@@ -39,6 +40,7 @@ class Balances:
         self.init_issue = kwargs.get('init_issue', DEFAULT_KWARGS['init_issue'])
         self.reward_dist = kwargs.get('reward_dist', DEFAULT_KWARGS['reward_dist'])
         self.reward = float(kwargs.get('reward', DEFAULT_KWARGS['reward']))
+        self.n_miners_max = int(kwargs.get('n_miners_max', DEFAULT_KWARGS['n_miners_max']))
 
         if self.init_issue:
             self.init_issue_max = float(kwargs['init_issue_max'])
@@ -51,12 +53,25 @@ class Balances:
         # generate initial balance values
         if self.init_issue:
             self.init_values = [ generate_random_value(self.init_issue_max)
-                                 for i in range(self.n_users)]
+                                 for _ in range(self.n_users)]
         else:
             self.init_values = [0.0] * self.n_users
 
+        # generate miners
+        self.miner = np.zeros(self.n_users, dtype=bool)
+        for _ in range(self.n_miners_max):
+            i = int(generate_random_value(self.n_users))
+            while self.miner[i]==1:
+                i = int(generate_random_value(self.n_users))
+
+            self.miner[i] = 1
+
+        assert len(self.miner[self.miner==True])==self.n_miners_max, \
+            "Number of miners in ledger is different from specified"
+
         self.data = pd.DataFrame(data = { 'address': self.keys,
-                                          'values': self.init_values })
+                                          'values': self.init_values,
+                                          'miner': self.miner })
 
     def transaction(self, from_ind, to_ind, val):
         self.data.at[from_ind, 'values'] -= val
