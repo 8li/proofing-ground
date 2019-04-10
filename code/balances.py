@@ -62,19 +62,20 @@ class Balances:
         self.data.at[from_ind, 'values'] -= val
         self.data.at[to_ind, 'values'] += val
 
+
     def gini(self):
-        """Calculate the Gini coefficient of a numpy array."""
-        # based on bottom eq: http://www.statsdirect.com/help/content/image/stat0206_wmf.gif
-        # from: http://www.statsdirect.com/help/default.htm#nonparametric_methods/gini.htm
-        vals = np.array(self.data['values'].values, dtype=float)
+        vals = self.data['values'].values
+        zero_area = 1e-100
 
         if np.amin(vals) < 0:
             vals -= np.amin(vals)
-        vals[np.where(vals==0)] += 1e-10  # no nonzero values
+
         vals = np.sort(vals)
-        index = np.arange(1, vals.shape[0] + 1)
-        n = vals.shape[0]
 
-        return ((np.sum((2 * index - n - 1) * vals)) / (n * np.sum(vals)))
+        n = len(vals)
+        total = np.sum(vals)
 
+        equality_area = total * n / 2. or zero_area
+        lorenz_area = np.sum(np.cumsum(vals) - vals / 2.) or zero_area
 
+        return (equality_area - lorenz_area) / equality_area
