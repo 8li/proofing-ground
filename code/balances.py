@@ -53,7 +53,7 @@ class Balances:
             self.init_values = [ generate_random_value(self.init_issue_max)
                                  for i in range(self.n_users)]
         else:
-            self.init_values = [0] * self.n_users
+            self.init_values = [0.0] * self.n_users
 
         self.data = pd.DataFrame(data = { 'address': self.keys,
                                           'values': self.init_values })
