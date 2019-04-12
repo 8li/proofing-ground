@@ -17,7 +17,8 @@ DEFAULT_KWARGS = { 'n_users' : int(config['default']['n_users']),
                    'n_miners_max' : int(config['default']['n_miners_max']),
                    'init_issue' : config['default']['init_issue'],
                    'reward_dist' : config['default']['reward_dist'],
-                   'reward' : config['default']['reward'] }
+                   'reward' : config['default']['reward'],
+                   'greed_factor' : config['default']['reward']}
 
 def random_key():
     # inspiration: https://www.reddit.com/r/Bitcoin/comments/7tzq3w/generate_your_own_private_key_5_lines_of_python/
@@ -34,7 +35,6 @@ def random_value(max_val):
 def random_int(max_val):
     return np.random.randint(0, max_val)
 
-
 class Balances:
     def __init__(self, **kwargs):
 
@@ -43,6 +43,7 @@ class Balances:
         self.init_issue = kwargs.get('init_issue', DEFAULT_KWARGS['init_issue'])
         self.reward_dist = kwargs.get('reward_dist', DEFAULT_KWARGS['reward_dist'])
         self.reward = float(kwargs.get('reward', DEFAULT_KWARGS['reward']))
+        self.greed_factor = float(kwargs.get('greed_factor', DEFAULT_KWARGS['greed_factor']))
 
         if self.init_issue:
             self.init_issue_total = float(kwargs['init_issue_total'])
@@ -91,9 +92,9 @@ class Balances:
                 "Initial issuance total is inconsistent {} != {} != {}".format(issue_total,
                                                                                np.sum(self.init_values),
                                                                                self.init_issue_total)
-
         # generate miners
         self.miner = np.zeros(self.n_users, dtype=bool)
+        self.miner_list = []
         for _ in range(self.n_miners_max):
             # select a random user who is not already designated a miner
             n = random_int(self.n_users)
@@ -101,20 +102,38 @@ class Balances:
                 n = random_int(self.n_users)
 
             self.miner[n] = 1
+            self.miner_list.append(n)
 
         assert len(self.miner[self.miner==True])==self.n_miners_max, \
             "Number of miners in ledger is different from specified"
 
+        # generate greedy users
+        self.greedy = np.zeros(self.n_users, dtype=bool)
+        self.greedy_list = []
+        if self.greed_factor:
+            self.n_greedy = int(self.n_users * self.greed_factor)
+
+            for _ in range(self.n_greedy):
+                # select a random user who is not already designated as greedy
+                n = random_int(self.n_users)
+                while self.greedy[n]==1:
+                    n = random_int(self.n_users)
+
+                self.greedy[n] = 1
+                self.greedy_list.append(n)
+
         self.data = pd.DataFrame(data = { 'address': self.keys,
                                           'values': self.init_values,
-                                          'miner': self.miner })
+                                          'miner': self.miner,
+                                          'greedy' : self.greedy })
 
     def params(self):
         params = { 'n_users' : self.n_users,
-                 'n_miners_max' : self.n_miners_max,
-                 'init_issue' : self.init_issue,
-                 'reward_dist' : self.reward_dist,
-                 'reward' : self.reward }
+                   'n_miners_max' : self.n_miners_max,
+                   'init_issue' : self.init_issue,
+                   'reward_dist' : self.reward_dist,
+                   'reward' : self.reward,
+                   'greed_factor' : self.greed_factor}
 
         if self.init_issue:
             params['init_issue_total'] = self.init_issue_total
@@ -124,7 +143,8 @@ class Balances:
         return params
 
     def transaction(self, from_ind, to_ind, val):
-        self.data.at[from_ind, 'values'] -= val
+        if from_ind is not None:
+            self.data.at[from_ind, 'values'] -= val
         self.data.at[to_ind, 'values'] += val
 
     def gini(self):
