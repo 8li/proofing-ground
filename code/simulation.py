@@ -52,7 +52,10 @@ class Simulation:
                 for _ in range(n_tx):
                     # select a sender and a receiver
                     from_ind = to_ind = random_int(self.n_users)
-                    while from_ind == to_ind and from_ind in self.balances.greedy_list:
+                    if self.balances.greed_factor:
+                        while from_ind in self.balances.greedy_list:
+                            from_ind = random_int(self.n_users)
+                    while from_ind == to_ind:
                         to_ind = random_int(self.n_users)
 
                     # transaction amount
