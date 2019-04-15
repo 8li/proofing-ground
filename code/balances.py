@@ -110,7 +110,7 @@ class Balances:
         # generate greedy users
         self.greedy = np.zeros(self.n_users, dtype=bool)
         self.greedy_list = []
-        self.alt_list = []
+
         if self.greed_factor:
             self.n_greedy = int(self.n_users * self.greed_factor)
 
@@ -122,10 +122,6 @@ class Balances:
 
                 self.greedy[n] = 1
                 self.greedy_list.append(n)
-
-            for user in range(self.n_users):
-                if user not in self.greedy_list:
-                    self.alt_list.append(user)
 
         self.data = pd.DataFrame(data = { 'address': self.keys,
                                           'values': self.init_values,
