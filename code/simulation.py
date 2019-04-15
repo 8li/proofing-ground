@@ -51,10 +51,13 @@ class Simulation:
 
                 for _ in range(n_tx):
                     # select a sender and a receiver
-                    from_ind = to_ind = random_int(self.n_users)
                     if self.balances.greed_factor:
-                        while from_ind in self.balances.greedy_list:
-                            from_ind = random_int(self.n_users)
+                        user_list = self.balances.alt_list
+                    else:
+                        user_list = np.arange(self.n_users)
+
+                    from_ind = np.random.choice(user_list)
+                    to_ind = random_int(self.n_users)
                     while from_ind == to_ind:
                         to_ind = random_int(self.n_users)
 
@@ -62,7 +65,6 @@ class Simulation:
                     val = random_value(self.tx_max)
 
                     self.balances.transaction(from_ind, to_ind, val)
-
                     # self.txdata = self.txdata.append(self.balances.data['values'], ignore_index=True)
 
             # reward a miner
