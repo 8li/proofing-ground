@@ -34,6 +34,7 @@ several parameters pertaining to cryptoeconomic systems may be evaluated by proo
 the gini coefficient is a statistical metric for distributional inequality that may be calculated from a plot of the cumulative percentage of the total wealth (or income) against the cumulative percentage of the participants:
 
 [![](imgs/lorenz-gini-increase-ani.gif)](http://www.econweb.com/texts/current/Mansions/inequality-measure.html)
+
 [![](imgs/0_3DTcZnzDwS6A6AtP.png)](https://towardsdatascience.com/gini-coefficient-and-lorenz-curve-f19bb8f46d66)
 
 
