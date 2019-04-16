@@ -9,7 +9,7 @@
 
 decentralized systems, such as those used in cryptocurrency, have demonstrated a tendency for centralization of wealth. especially for those systems in which wealth equates to power (i.e. proof of stake), this runs counter to the originating decentralized ethos.
 
-[![](imgs/bitcoin-wealth-distribution.jpg)](https://www.landmarkcash.com/articles/bitcoin-wealth-distribution.html)
+[![](imgs/bitcoin-wealth-distribution.jpg)<!-- .element height="25%" width="25%" -->](https://www.landmarkcash.com/articles/bitcoin-wealth-distribution.html)
 
 proofing ground aims to examine and discover conditions and mechanisms which may enable greater wealth equality for decentralized systems. wealth inequality is captured by the gini coefficient, a common statistical measure of distributional inequality.
 
