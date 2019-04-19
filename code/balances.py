@@ -156,6 +156,17 @@ class Balances:
             self.data.at[from_ind, 'values'] -= val
         self.data.at[to_ind, 'values'] += val
 
+    def reinit(self):
+        self.greedy = np.zeros(self.n_users, dtype=bool)
+        self.greedy_list = []
+        if self.greed_factor:
+            self.generate_greedy()
+
+        self.data = pd.DataFrame(data = { 'address': self.keys,
+                                          'values': self.init_values,
+                                          'miner': self.miner,
+                                          'greedy' : self.greedy })
+
     def gini(self, initial=None):
         if initial:
             vals = self.init_values
