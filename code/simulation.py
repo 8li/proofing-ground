@@ -32,8 +32,8 @@ class Simulation:
         self.tx_max = float(kwargs.get('tx_max', DEFAULT_KWARGS['tx_max']))
         self.n_users = self.balances.n_users
 
-        #self.tx_data = pd.DataFrame()
-        self.gini_data = np.empty(self.n_sims)
+        self.tx_data = pd.DataFrame()
+        self.gini = np.empty(self.n_sims)
 
     def params(self):
         return { 'n_sims' : self.n_sims,
@@ -43,7 +43,7 @@ class Simulation:
 
     def simulate(self):
         for sim in range(self.n_sims):
-            print(sim)
+            # print(sim)
             for block in range(self.n_blocks):
 
                 # transactions per block
@@ -63,14 +63,15 @@ class Simulation:
 
                     self.balances.transaction(from_ind, to_ind, val)
 
-                    # self.txdata = self.txdata.append(self.balances.data['values'], ignore_index=True)
+                # reward a miner
+                to_ind = np.random.choice(self.balances.miner_list)
+                self.balances.transaction(None, to_ind, self.balances.reward)
 
-            # reward a miner
-            to_ind = np.random.choice(self.balances.miner_list)
-            self.balances.transaction(None, to_ind, self.balances.reward)
+                # record balance state
+                if block % 1000 == 0:
+                    self.tx_data = self.tx_data.append(self.balances.data['values'])
 
             # record gini coefficient
-            #self.gini.append(self.balances.gini())
-            self.gini_data[sim] = self.balances.gini()
+            self.gini[sim] = self.balances.gini()
 
-        return self.gini_data
+        return self.tx_data, self.gini
