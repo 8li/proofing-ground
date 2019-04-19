@@ -26,7 +26,7 @@ several parameters pertaining to cryptoeconomic systems may be evaluated by proo
 
 - initial issuance
 - user behavior (i.e. greed)
-- [planned] consensus mechanisms
+- [in progress] consensus mechanisms
 - [planned] wealth redistribution
 
 ## gini coefficient
