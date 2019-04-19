@@ -95,6 +95,21 @@ class Balances:
         # generate miners
         self.miner = np.zeros(self.n_users, dtype=bool)
         self.miner_list = []
+        self.generate_miners()
+
+        # generate greedy users
+        self.greedy = np.zeros(self.n_users, dtype=bool)
+        self.greedy_list = []
+        if self.greed_factor:
+            self.generate_greedy()
+
+        self.data = pd.DataFrame(data = { 'address': self.keys,
+                                          'values': self.init_values,
+                                          'miner': self.miner,
+                                          'greedy' : self.greedy })
+
+    def generate_miners(self):
+        # generate miners
         for _ in range(self.n_miners_max):
             # select a random user who is not already designated a miner
             n = random_int(self.n_users)
@@ -107,26 +122,19 @@ class Balances:
         assert len(self.miner[self.miner==True])==self.n_miners_max, \
             "Number of miners in ledger is different from specified"
 
+    def generate_greedy(self):
         # generate greedy users
-        self.greedy = np.zeros(self.n_users, dtype=bool)
-        self.greedy_list = []
+        self.n_greedy = int(self.n_users * self.greed_factor)
 
-        if self.greed_factor:
-            self.n_greedy = int(self.n_users * self.greed_factor)
-
-            for _ in range(self.n_greedy):
-                # select a random user who is not already designated as greedy
+        for _ in range(self.n_greedy):
+            # select a random user who is not already designated as greedy
+            n = random_int(self.n_users)
+            while self.greedy[n]==1:
                 n = random_int(self.n_users)
-                while self.greedy[n]==1:
-                    n = random_int(self.n_users)
 
-                self.greedy[n] = 1
-                self.greedy_list.append(n)
+            self.greedy[n] = 1
+            self.greedy_list.append(n)
 
-        self.data = pd.DataFrame(data = { 'address': self.keys,
-                                          'values': self.init_values,
-                                          'miner': self.miner,
-                                          'greedy' : self.greedy })
 
     def params(self):
         params = { 'n_users' : self.n_users,
